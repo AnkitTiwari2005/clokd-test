@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clokd - Class Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <h1>Clokd</h1>
+            <button id="theme-toggle" aria-label="Toggle theme">
+                <img src="assets/icons/sun.svg" alt="Light mode" id="theme-icon">
+            </button>
+        </div>
+    </header>
+
+    <!-- Dashboard -->
+    <main class="dashboard" id="dashboard">
+        <!-- Friend cards dynamically populated -->
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <button class="close-btn" id="close-modal">&times;</button>
+            <div class="friend-header">
+                <h2 id="detail-name">Friend Name</h2>
+                <a href="#" id="call-btn" class="call-btn">
+                    <img src="assets/icons/phone.svg" alt="Call">
+                </a>
+            </div>
+            
+            <div class="alias-section">
+                <input type="text" id="alias-input" placeholder="Set nickname">
+                <button id="save-alias">Save</button>
+            </div>
+            
+            <div class="status-container">
+                <div class="current-status">
+                    <h3>Current Status</h3>
+                    <p id="current-status-text">Loading...</p>
+                </div>
+                <div class="next-free">
+                    <h3>Next Free</h3>
+                    <p id="next-free-text">Loading...</p>
+                </div>
+            </div>
+            
+            <h3>Today's Schedule</h3>
+            <div class="timetable" id="timetable">
+                <!-- Timetable dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Created by Ankit Tiwari</p>
+        <a href="https://www.linkedin.com/in/ankit-k-tiwari/" target="_blank">
+            <img src="assets/icons/linkedin.svg" alt="LinkedIn">
+        </a>
+    </footer>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
