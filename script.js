@@ -2,6 +2,7 @@
 const dashboard = document.getElementById('dashboard');
 const modal = document.getElementById('detail-modal');
 const closeModal = document.getElementById('close-modal');
+const backBtn = document.getElementById('back-btn');
 const detailName = document.getElementById('detail-name');
 const callBtn = document.getElementById('call-btn');
 const aliasInput = document.getElementById('alias-input');
@@ -27,12 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup event listeners
     setupEventListeners();
-    
-    // Security measures
-    applySecurityMeasures();
-    
-    // Show security message
-    showSecurityMessage();
 });
 
 // Theme Functions
@@ -136,6 +131,9 @@ function openFriendDetail(friendId) {
     // Show modal
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    
+    // Scroll to top
+    modal.scrollTo(0, 0);
 }
 
 function updateFriendStatus(friend) {
@@ -180,6 +178,7 @@ function renderTimetable(friend) {
     
     // Add day header
     const dayHeader = document.createElement('h3');
+    dayHeader.className = 'timetable-heading';
     dayHeader.textContent = `${today}'s Schedule`;
     timetable.appendChild(dayHeader);
     
@@ -210,10 +209,7 @@ function renderTimetable(friend) {
         }
         
         item.innerHTML = `
-            <div class="time">
-                <span>${event.start}</span>
-                <span>${event.end}</span>
-            </div>
+            <div class="time">${event.start} - ${event.end}</div>
             <div class="event-details">
                 <strong>${event.title}</strong>
                 <div>${event.faculty} • ${event.location}</div>
@@ -238,10 +234,10 @@ function setupEventListeners() {
     });
     
     // Modal close
-    closeModal.addEventListener('click', () => {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-    });
+    closeModal.addEventListener('click', closeModalHandler);
+    
+    // Back button
+    backBtn.addEventListener('click', closeModalHandler);
     
     // Save alias
     saveAlias.addEventListener('click', () => {
@@ -260,18 +256,17 @@ function setupEventListeners() {
         
         // Show confirmation
         const button = saveAlias;
-        const originalText = button.innerHTML;
-        button.innerHTML = '✓ Saved';
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
         setTimeout(() => {
-            button.innerHTML = originalText;
+            button.innerHTML = originalHTML;
         }, 2000);
     });
     
     // Close modal when clicking outside
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
+            closeModalHandler();
         }
     });
     
@@ -281,55 +276,23 @@ function setupEventListeners() {
             saveAlias.click();
         }
     });
+    
+    // Prevent zoom on double-tap
+    document.addEventListener('dblclick', e => {
+        e.preventDefault();
+    }, { passive: false });
 }
 
-// Security Measures
-function applySecurityMeasures() {
-    // Disable context menu
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    
-    // Block common dev tools shortcuts
-    document.addEventListener('keydown', e => {
-        // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-        if (
-            e.key === 'F12' ||
-            (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-            (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-            (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-            (e.ctrlKey && e.key === 'u')
-        ) {
-            e.preventDefault();
-        }
-    });
-    
-    // Anti-debugging (basic)
-    const consoleOpen = () => {
-        document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#0f172a; color:white; font-family:sans-serif;"><h1>Access Restricted</h1></div>';
-        window.location.reload();
-    };
-    
-    setInterval(() => {
-        const before = new Date().getTime();
-        debugger;
-        const after = new Date().getTime();
-        if (after - before > 100) consoleOpen();
-    }, 1000);
+function closeModalHandler() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
 }
 
-function showSecurityMessage() {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'security-message';
-    messageDiv.textContent = 'For security reasons, developer tools are disabled on this page';
-    document.body.appendChild(messageDiv);
-    
-    setTimeout(() => {
-        messageDiv.classList.add('visible');
-    }, 1000);
-    
-    setTimeout(() => {
-        messageDiv.classList.remove('visible');
-        setTimeout(() => {
-            messageDiv.remove();
-        }, 300);
-    }, 5000);
+// Mobile viewport height fix
+function setAppHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
+
+window.addEventListener('resize', setAppHeight);
+setAppHeight();

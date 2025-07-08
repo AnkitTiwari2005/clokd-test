@@ -2,15 +2,16 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
     <title>Clokd - Class Tracker</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 </head>
 <body>
     <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="brand">
+        <!-- Mobile Top Bar -->
+        <div class="mobile-top-bar">
+            <div class="mobile-header">
                 <div class="logo">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
@@ -22,18 +23,7 @@
                     <img src="assets/icons/sun.svg" alt="Light mode" id="theme-icon">
                 </button>
             </div>
-        </header>
-
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Track Friends' Classes</h2>
-                <p>See who's free and who's in class right now</p>
-            </div>
-            <div class="hero-illustration">
-                <!-- Background illustration will be added via CSS -->
-            </div>
-        </section>
+        </div>
 
         <!-- Dashboard -->
         <main class="dashboard" id="dashboard">
@@ -48,7 +38,14 @@
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                     </svg>
                 </button>
-                <div class="friend-header">
+                
+                <!-- Mobile Modal Header -->
+                <div class="mobile-modal-header">
+                    <button class="back-btn" id="back-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                        </svg>
+                    </button>
                     <h2 id="detail-name">Friend Name</h2>
                     <a href="#" id="call-btn" class="call-btn">
                         <img src="assets/icons/phone.svg" alt="Call">
@@ -61,35 +58,36 @@
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
                         </svg>
-                        Save
                     </button>
                 </div>
                 
                 <div class="status-container">
-                    <div class="current-status">
+                    <div class="status-card current-status">
                         <h3>Current Status</h3>
                         <p id="current-status-text">Loading...</p>
                     </div>
-                    <div class="next-free">
+                    <div class="status-card next-free">
                         <h3>Next Free</h3>
                         <p id="next-free-text">Loading...</p>
                     </div>
                 </div>
                 
-                <h3>Today's Schedule</h3>
+                <h3 class="timetable-heading">Today's Schedule</h3>
                 <div class="timetable" id="timetable">
                     <!-- Timetable dynamically populated -->
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p>Created by Ankit Tiwari</p>
-            <a href="https://www.linkedin.com/in/ankit-k-tiwari/" target="_blank" aria-label="LinkedIn">
-                <img src="assets/icons/linkedin.svg" alt="LinkedIn">
-            </a>
-        </footer>
+        <!-- Mobile Bottom Bar -->
+        <div class="mobile-bottom-bar">
+            <div class="footer">
+                <p>Created by Ankit Tiwari</p>
+                <a href="https://www.linkedin.com/in/ankit-k-tiwari/" target="_blank" aria-label="LinkedIn">
+                    <img src="assets/icons/linkedin.svg" alt="LinkedIn">
+                </a>
+            </div>
+        </div>
     </div>
 
     <script src="data.js"></script>
