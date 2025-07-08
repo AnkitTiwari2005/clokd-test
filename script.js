@@ -219,13 +219,22 @@ function renderTimetable(friend) {
             item.classList.add('past');
         }
         
+        // Determine event type class
+        const eventTypeClass = event.type === 'Class' ? 'class' : 
+                              event.type === 'Break' ? 'break' : '';
+        
+        // Format details
+        const detailsHTML = event.type === 'Break' 
+            ? `<strong>${event.title}</strong>`
+            : `<strong>${event.title}</strong>
+               <div>${event.faculty} • ${event.location}</div>`;
+        
         item.innerHTML = `
             <div class="time">${event.start} - ${event.end}</div>
             <div class="event-details">
-                <strong>${event.title}</strong>
-                <div>${event.faculty} • ${event.location}</div>
+                ${detailsHTML}
             </div>
-            <div class="event-type ${event.type === 'Class' ? 'class' : ''}">
+            <div class="event-type ${eventTypeClass}">
                 ${event.type}
             </div>
         `;
@@ -263,6 +272,10 @@ function setupEventListeners() {
         
         localStorage.setItem('clokd_aliases', JSON.stringify(aliases));
         detailName.textContent = newAlias || friends.find(f => f.id === currentFriendId).name;
+        
+        // Clear input after save
+        aliasInput.value = '';
+        
         renderDashboard();
         
         // Show confirmation
