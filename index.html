@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,62 +7,90 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="brand">
-            <h1>Clokd</h1>
-            <button id="theme-toggle" aria-label="Toggle theme">
-                <img src="assets/icons/sun.svg" alt="Light mode" id="theme-icon">
-            </button>
-        </div>
-    </header>
-
-    <!-- Dashboard -->
-    <main class="dashboard" id="dashboard">
-        <!-- Friend cards dynamically populated -->
-    </main>
-
-    <!-- Detail Modal -->
-    <div class="modal" id="detail-modal">
-        <div class="modal-content">
-            <button class="close-btn" id="close-modal">&times;</button>
-            <div class="friend-header">
-                <h2 id="detail-name">Friend Name</h2>
-                <a href="#" id="call-btn" class="call-btn">
-                    <img src="assets/icons/phone.svg" alt="Call">
-                </a>
-            </div>
-            
-            <div class="alias-section">
-                <input type="text" id="alias-input" placeholder="Set nickname">
-                <button id="save-alias">Save</button>
-            </div>
-            
-            <div class="status-container">
-                <div class="current-status">
-                    <h3>Current Status</h3>
-                    <p id="current-status-text">Loading...</p>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="brand">
+                <div class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/>
+                        <path d="M13 7h-2v6h6v-2h-4z"/>
+                    </svg>
+                    <h1>Clokd</h1>
                 </div>
-                <div class="next-free">
-                    <h3>Next Free</h3>
-                    <p id="next-free-text">Loading...</p>
+                <button id="theme-toggle" aria-label="Toggle theme">
+                    <img src="assets/icons/sun.svg" alt="Light mode" id="theme-icon">
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Track Friends' Classes</h2>
+                <p>See who's free and who's in class right now</p>
+            </div>
+            <div class="hero-illustration">
+                <!-- Background illustration will be added via CSS -->
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <main class="dashboard" id="dashboard">
+            <!-- Friend cards dynamically populated -->
+        </main>
+
+        <!-- Detail Modal -->
+        <div class="modal" id="detail-modal">
+            <div class="modal-content">
+                <button class="close-btn" id="close-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+                <div class="friend-header">
+                    <h2 id="detail-name">Friend Name</h2>
+                    <a href="#" id="call-btn" class="call-btn">
+                        <img src="assets/icons/phone.svg" alt="Call">
+                    </a>
+                </div>
+                
+                <div class="alias-section">
+                    <input type="text" id="alias-input" placeholder="Set nickname">
+                    <button id="save-alias">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                        </svg>
+                        Save
+                    </button>
+                </div>
+                
+                <div class="status-container">
+                    <div class="current-status">
+                        <h3>Current Status</h3>
+                        <p id="current-status-text">Loading...</p>
+                    </div>
+                    <div class="next-free">
+                        <h3>Next Free</h3>
+                        <p id="next-free-text">Loading...</p>
+                    </div>
+                </div>
+                
+                <h3>Today's Schedule</h3>
+                <div class="timetable" id="timetable">
+                    <!-- Timetable dynamically populated -->
                 </div>
             </div>
-            
-            <h3>Today's Schedule</h3>
-            <div class="timetable" id="timetable">
-                <!-- Timetable dynamically populated -->
-            </div>
         </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Created by Ankit Tiwari</p>
+            <a href="https://www.linkedin.com/in/ankit-k-tiwari/" target="_blank" aria-label="LinkedIn">
+                <img src="assets/icons/linkedin.svg" alt="LinkedIn">
+            </a>
+        </footer>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>Created by Ankit Tiwari</p>
-        <a href="https://www.linkedin.com/in/ankit-k-tiwari/" target="_blank">
-            <img src="assets/icons/linkedin.svg" alt="LinkedIn">
-        </a>
-    </footer>
 
     <script src="data.js"></script>
     <script src="script.js"></script>

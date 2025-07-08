@@ -1,4 +1,3 @@
-
 // DOM Elements
 const dashboard = document.getElementById('dashboard');
 const modal = document.getElementById('detail-modal');
@@ -31,6 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Security measures
     applySecurityMeasures();
+    
+    // Show security message
+    showSecurityMessage();
 });
 
 // Theme Functions
@@ -73,7 +75,7 @@ function renderDashboard() {
                     <div>👨‍🏫 ${event.faculty}</div>
                     <div>🏫 ${event.location}</div>
                 </div>
-            ` : ''}
+            ` : '<div class="details">No current class</div>'}
         `;
         
         card.addEventListener('click', () => openFriendDetail(friend.id));
@@ -123,6 +125,7 @@ function openFriendDetail(friendId) {
     
     // Set alias input
     aliasInput.value = aliases[friendId] || '';
+    aliasInput.placeholder = `Set nickname for ${friend.name.split(' ')[0]}`;
     
     // Update status
     updateFriendStatus(friend);
@@ -132,6 +135,7 @@ function openFriendDetail(friendId) {
     
     // Show modal
     modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 }
 
 function updateFriendStatus(friend) {
@@ -174,8 +178,16 @@ function renderTimetable(friend) {
     const today = days[dayIndex];
     const currentTime = now.getHours() * 100 + now.getMinutes();
     
+    // Add day header
+    const dayHeader = document.createElement('h3');
+    dayHeader.textContent = `${today}'s Schedule`;
+    timetable.appendChild(dayHeader);
+    
     if (!friend.timetable[today]) {
-        timetable.innerHTML = '<p>No classes scheduled for today</p>';
+        const noClasses = document.createElement('p');
+        noClasses.textContent = 'No classes scheduled for today';
+        noClasses.classList.add('no-classes');
+        timetable.appendChild(noClasses);
         return;
     }
     
@@ -198,7 +210,10 @@ function renderTimetable(friend) {
         }
         
         item.innerHTML = `
-            <div class="time">${event.start} - ${event.end}</div>
+            <div class="time">
+                <span>${event.start}</span>
+                <span>${event.end}</span>
+            </div>
             <div class="event-details">
                 <strong>${event.title}</strong>
                 <div>${event.faculty} • ${event.location}</div>
@@ -225,6 +240,7 @@ function setupEventListeners() {
     // Modal close
     closeModal.addEventListener('click', () => {
         modal.classList.remove('active');
+        document.body.style.overflow = '';
     });
     
     // Save alias
@@ -241,12 +257,28 @@ function setupEventListeners() {
         localStorage.setItem('clokd_aliases', JSON.stringify(aliases));
         detailName.textContent = newAlias || friends.find(f => f.id === currentFriendId).name;
         renderDashboard();
+        
+        // Show confirmation
+        const button = saveAlias;
+        const originalText = button.innerHTML;
+        button.innerHTML = '✓ Saved';
+        setTimeout(() => {
+            button.innerHTML = originalText;
+        }, 2000);
     });
     
     // Close modal when clicking outside
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Enter key for alias input
+    aliasInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            saveAlias.click();
         }
     });
 }
@@ -272,7 +304,7 @@ function applySecurityMeasures() {
     
     // Anti-debugging (basic)
     const consoleOpen = () => {
-        document.body.innerHTML = '<h1>Access restricted</h1>';
+        document.body.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#0f172a; color:white; font-family:sans-serif;"><h1>Access Restricted</h1></div>';
         window.location.reload();
     };
     
@@ -282,4 +314,22 @@ function applySecurityMeasures() {
         const after = new Date().getTime();
         if (after - before > 100) consoleOpen();
     }, 1000);
+}
+
+function showSecurityMessage() {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'security-message';
+    messageDiv.textContent = 'For security reasons, developer tools are disabled on this page';
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.classList.add('visible');
+    }, 1000);
+    
+    setTimeout(() => {
+        messageDiv.classList.remove('visible');
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 300);
+    }, 5000);
 }
