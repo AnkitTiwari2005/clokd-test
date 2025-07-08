@@ -656,3 +656,50 @@ body {
         padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
     }
 }
+
+/* Card header and call button */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.card-call-btn {
+    background: var(--accent-light);
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    margin-left: 0.5rem;
+    transition: all 0.2s;
+}
+
+.card-call-btn:hover {
+    transform: scale(1.05);
+    background: var(--accent);
+}
+
+.card-call-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+/* Modal header fix */
+.mobile-modal-header {
+    position: relative;
+    padding-right: 40px; /* Space for close button */
+}
+
+.close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* Hide day name in timetable */
+.timetable-day-heading {
+    display: none;
+}

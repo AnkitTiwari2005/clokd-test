@@ -60,7 +60,12 @@ function renderDashboard() {
         const displayName = aliases[friend.id] || friend.name;
         
         card.innerHTML = `
-            <h2>${displayName}</h2>
+            <div class="card-header">
+                <h2>${displayName}</h2>
+                <a href="tel:${friend.phone.replace(/\s/g, '')}" class="card-call-btn">
+                    <img src="assets/icons/phone.svg" alt="Call">
+                </a>
+            </div>
             <div class="status ${status}">
                 ${isFree ? '🟢 Free' : '🔴 In Class'}
             </div>
@@ -73,7 +78,13 @@ function renderDashboard() {
             ` : '<div class="details">No current class</div>'}
         `;
         
-        card.addEventListener('click', () => openFriendDetail(friend.id));
+        card.addEventListener('click', (e) => {
+            // Only open detail if not clicking on call button
+            if (!e.target.closest('.card-call-btn')) {
+                openFriendDetail(friend.id);
+            }
+        });
+        
         dashboard.appendChild(card);
     });
 }
@@ -179,7 +190,7 @@ function renderTimetable(friend) {
     // Add day header
     const dayHeader = document.createElement('h3');
     dayHeader.className = 'timetable-heading';
-    dayHeader.textContent = `${today}'s Schedule`;
+    dayHeader.textContent = "Today's Schedule";
     timetable.appendChild(dayHeader);
     
     if (!friend.timetable[today]) {
