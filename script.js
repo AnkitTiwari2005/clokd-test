@@ -12,11 +12,19 @@ const nextFreeText = document.getElementById('next-free-text');
 const timetable = document.getElementById('timetable');
 const themeToggle = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
+const commonSlotBtn = document.getElementById('common-slot-btn');
+const commonSlotModal = document.getElementById('common-slot-modal');
+const closeCommonModal = document.getElementById('close-common-modal');
+const friendsSelectContainer = document.getElementById('friends-select-container');
+const daySelect = document.getElementById('day-select');
+const calculateBtn = document.getElementById('calculate-btn');
+const resultsContainer = document.getElementById('results');
 
 // State
 let currentFriendId = null;
 const aliases = JSON.parse(localStorage.getItem('clokd_aliases')) || {};
 const theme = localStorage.getItem('clokd_theme') || 'light';
+let lastStatus = {}; // Track last known status for notifications
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,6 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup event listeners
     setupEventListeners();
+    
+    // Initialize status tracking
+    friends.forEach(friend => {
+        const { status } = getCurrentStatus(friend);
+        lastStatus[friend.id] = status;
+    });
+    
+    // Check for status changes every 30 seconds
+    setInterval(checkForStatusChanges, 30000);
 });
 
 // Theme Functions
@@ -70,11 +87,11 @@ function renderDashboard() {
                 ${isFree ? '🟢 Free' : '🔴 In Class'}
             </div>
             ${!isFree ? `
-                <div class="details">
-                    <div>📚 ${event.title}</div>
-                    <div>👨‍🏫 ${event.faculty}</div>
-                    <div>🏫 ${event.location}</div>
-                </div>
+            <div class="details">
+                <div>📚 ${event.title}</div>
+                <div>👨‍🏫 ${event.faculty}</div>
+                <div>🏫 ${event.location}</div>
+            </div>
             ` : '<div class="details">No current class</div>'}
         `;
         
@@ -109,9 +126,9 @@ function getCurrentStatus(friend) {
         const endTime = endHour * 100 + endMinute;
         
         if (currentTime >= startTime && currentTime < endTime) {
-            return { 
-                status: event.type === 'Break' ? 'free' : 'in-class', 
-                event 
+            return {
+                status: event.type === 'Break' ? 'free' : 'in-class',
+                event
             };
         }
     }
@@ -150,8 +167,8 @@ function openFriendDetail(friendId) {
 function updateFriendStatus(friend) {
     const { status, event } = getCurrentStatus(friend);
     
-    currentStatusText.textContent = status === 'free' 
-        ? '🟢 Currently free' 
+    currentStatusText.textContent = status === 'free'
+        ? '🟢 Currently free'
         : `🔴 In class: ${event.title}`;
     
     nextFreeText.textContent = getNextFreeTime(friend);
@@ -213,7 +230,7 @@ function renderTimetable(friend) {
         // Check if current event
         if (currentTime >= startTime && currentTime < endTime) {
             item.classList.add('current');
-        } 
+        }
         // Check if past event
         else if (currentTime >= endTime) {
             item.classList.add('past');
@@ -221,10 +238,10 @@ function renderTimetable(friend) {
         
         // Determine event type class
         const eventTypeClass = event.type === 'Class' ? 'class' : 
-                              event.type === 'Break' ? 'break' : '';
+            event.type === 'Break' ? 'break' : '';
         
         // Format details
-        const detailsHTML = event.type === 'Break' 
+        const detailsHTML = event.type === 'Break'
             ? `<strong>${event.title}</strong>`
             : `<strong>${event.title}</strong>
                <div>${event.faculty} • ${event.location}</div>`;
@@ -243,12 +260,191 @@ function renderTimetable(friend) {
     });
 }
 
+// Common Free Slot Functions
+function renderFriendsSelector() {
+    friendsSelectContainer.innerHTML = '';
+    
+    friends.forEach(friend => {
+        const div = document.createElement('div');
+        div.className = 'friend-selector';
+        
+        const displayName = aliases[friend.id] || friend.name;
+        const { status } = getCurrentStatus(friend);
+        
+        div.innerHTML = `
+            <input type="checkbox" id="friend-${friend.id}" value="${friend.id}">
+            <label for="friend-${friend.id}" class="${status}">
+                <span class="status-indicator ${status}"></span>
+                ${displayName}
+            </label>
+        `;
+        
+        friendsSelectContainer.appendChild(div);
+    });
+}
+
+function calculateCommonFreeSlots() {
+    const selectedFriendIds = [];
+    document.querySelectorAll('#friends-select-container input:checked').forEach(checkbox => {
+        selectedFriendIds.push(parseInt(checkbox.value));
+    });
+    
+    if (selectedFriendIds.length < 2) {
+        resultsContainer.innerHTML = '<p class="no-results">Please select at least 2 friends</p>';
+        return;
+    }
+    
+    const day = daySelect.value;
+    const commonSlots = getCommonFreeSlots(selectedFriendIds, day);
+    
+    if (commonSlots.length === 0) {
+        resultsContainer.innerHTML = '<p class="no-results">No common free time found</p>';
+        return;
+    }
+    
+    let html = '<div class="slots-container">';
+    commonSlots.forEach(slot => {
+        html += `
+            <div class="time-slot">
+                <span class="slot-time">${slot.start} - ${slot.end}</span>
+                <span class="slot-duration">${slot.duration} min</span>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    resultsContainer.innerHTML = html;
+}
+
+function getCommonFreeSlots(friendIds, day) {
+    // Create a timeline for the day (9am to 5pm)
+    const timeline = Array(480).fill(0); // 8 hours * 60 minutes = 480 minutes
+    const startHour = 9; // 9am
+    
+    // Mark busy times for each friend
+    friendIds.forEach(id => {
+        const friend = friends.find(f => f.id === id);
+        if (!friend || !friend.timetable[day]) return;
+        
+        friend.timetable[day].forEach(event => {
+            if (event.type === 'Class') {
+                const [startHourStr, startMinuteStr] = event.start.split(':');
+                const [endHourStr, endMinuteStr] = event.end.split(':');
+                
+                const startTime = (parseInt(startHourStr) - startHour) * 60 + parseInt(startMinuteStr);
+                const endTime = (parseInt(endHourStr) - startHour) * 60 + parseInt(endMinuteStr);
+                
+                // Mark the busy period
+                for (let i = startTime; i < endTime && i < timeline.length; i++) {
+                    timeline[i]++;
+                }
+            }
+        });
+    });
+    
+    // Find common free slots (where all friends are free)
+    const commonSlots = [];
+    let inSlot = false;
+    let slotStart = 0;
+    const totalFriends = friendIds.length;
+    
+    for (let i = 0; i < timeline.length; i++) {
+        if (timeline[i] === 0) { // All friends free at this minute
+            if (!inSlot) {
+                inSlot = true;
+                slotStart = i;
+            }
+        } else {
+            if (inSlot) {
+                inSlot = false;
+                const duration = i - slotStart;
+                if (duration >= 15) { // Only show slots of 15+ minutes
+                    const startTime = formatTime(slotStart, startHour);
+                    const endTime = formatTime(i, startHour);
+                    commonSlots.push({
+                        start: startTime,
+                        end: endTime,
+                        duration: duration
+                    });
+                }
+            }
+        }
+    }
+    
+    // Handle slot ending at end of day
+    if (inSlot) {
+        const duration = timeline.length - slotStart;
+        if (duration >= 15) {
+            const startTime = formatTime(slotStart, startHour);
+            const endTime = formatTime(timeline.length, startHour);
+            commonSlots.push({
+                start: startTime,
+                end: endTime,
+                duration: duration
+            });
+        }
+    }
+    
+    return commonSlots;
+}
+
+function formatTime(minutes, startHour) {
+    const totalMinutes = minutes;
+    const hours = Math.floor(totalMinutes / 60) + startHour;
+    const mins = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+}
+
+// Status Change Notifications
+function checkForStatusChanges() {
+    friends.forEach(friend => {
+        const { status } = getCurrentStatus(friend);
+        const prevStatus = lastStatus[friend.id];
+        
+        if (prevStatus === 'in-class' && status === 'free') {
+            showFreeNotification(friend);
+        }
+        
+        lastStatus[friend.id] = status;
+    });
+}
+
+function showFreeNotification(friend) {
+    const displayName = aliases[friend.id] || friend.name;
+    const notification = document.createElement('div');
+    notification.className = 'notification free';
+    notification.innerHTML = `
+        <span class="notification-icon">🎉</span>
+        <div class="notification-content">
+            <strong>${displayName} is now free!</strong>
+            <p>You can call or message them</p>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateY(0)';
+        notification.style.opacity = '1';
+    }, 10);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateY(-100%)';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 5000);
+}
+
 // Event Handlers
 function setupEventListeners() {
     // Theme toggle
     themeToggle.addEventListener('click', () => {
-        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' 
-            ? 'light' 
+        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark'
+            ? 'light'
             : 'dark';
         applyTheme(newTheme);
     });
@@ -305,6 +501,30 @@ function setupEventListeners() {
     document.addEventListener('dblclick', e => {
         e.preventDefault();
     }, { passive: false });
+    
+    // Common free slot button
+    commonSlotBtn.addEventListener('click', () => {
+        renderFriendsSelector();
+        commonSlotModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+    
+    // Close common slot modal
+    closeCommonModal.addEventListener('click', () => {
+        commonSlotModal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    
+    // Calculate common free slots
+    calculateBtn.addEventListener('click', calculateCommonFreeSlots);
+    
+    // Close common slot modal when clicking outside
+    commonSlotModal.addEventListener('click', (e) => {
+        if (e.target === commonSlotModal) {
+            commonSlotModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
 }
 
 function closeModalHandler() {
