@@ -294,6 +294,12 @@ body {
     gap: 0.5rem;
 }
 
+.next-class {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border);
+}
+
 /* Modal */
 .modal {
     position: fixed;
@@ -452,9 +458,6 @@ body {
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
     box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
     min-width: 50px;
 }
