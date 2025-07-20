@@ -294,12 +294,6 @@ body {
     gap: 0.5rem;
 }
 
-.next-class {
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed var(--border);
-}
-
 /* Modal */
 .modal {
     position: fixed;
@@ -458,6 +452,9 @@ body {
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
     min-width: 50px;
 }
@@ -1017,4 +1014,61 @@ body {
     .mobile-bottom-bar {
         padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
     }
+}
+
+/* Add these styles to the existing file */
+
+/* Timetable Header */
+.timetable-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.timetable-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timetable-header h3::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent);
+}
+
+#timetable-day {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  cursor: pointer;
+}
+
+#timetable-day:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+}
+
+/* Tablet and Desktop Styles */
+@media (min-width: 768px) {
+  .timetable-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  #timetable-day {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+  }
 }
